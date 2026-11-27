@@ -1,0 +1,66 @@
+.heroSection {
+  background: radial-gradient(circle at 12% 18%, #eef2ff 0%, transparent 45%),
+    radial-gradient(circle at 88% 20%, #e0f2fe 0%, transparent 42%),
+    #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 3.5rem 0 4.5rem;
+
+  @media (min-width: 992px) {
+    padding: 5rem 0 5.5rem;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.1rem, 4.4vw, 3.35rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.previewCard {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 60px rgba(79, 70, 229, 0.14), 0 4px 16px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.chatBubbleUser {
+  background: #eef2ff;
+  color: #1e1b4b;
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.chatBubbleAi {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  padding: 0.85rem 1rem;
+}
+
+.stepCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faqItem {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.15rem 1.35rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.06);
+  }
+}

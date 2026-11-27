@@ -1,0 +1,66 @@
+.voiceBox {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.dotListening {
+  background-color: #ef4444;
+  animation: dotPulse 1s infinite;
+}
+
+.dotProcessing {
+  background-color: #4f46e5;
+  animation: dotPulse 1s infinite;
+}
+
+.dotSpeaking {
+  background-color: #10b981;
+  animation: dotPulse 1s infinite;
+}
+
+.dotReady {
+  background-color: #0ea5e9;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+.micBtnActive {
+  animation: micPulse 1.5s infinite;
+  @keyframes micPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+  }
+}
+
+.interimPill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #334155;
+}
