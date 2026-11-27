@@ -9,6 +9,11 @@ import { createDefaultAppState } from '../src/lib/storage/defaultState.js';
 import { GRAMMAR_LESSONS } from '../src/data/grammarLessons.js';
 import { VOCABULARY_SETS } from '../src/data/vocabularyData.js';
 import { CONVERSATION_SCENARIOS } from '../src/data/conversationScenarios.js';
+import {
+  SYLLABUS_STAGES,
+  SYLLABUS_MODULES,
+  CERTIFICATION_TIERS,
+} from '../src/data/syllabusData.js';
 
 test('computeUpdatedStreak increments on consecutive day and resets after gap', () => {
   assert.equal(computeUpdatedStreak('2026-11-26', 4, '2026-11-27'), 5);
@@ -39,4 +44,7 @@ test('createDefaultAppState and curriculum datasets satisfy required counts', ()
   }
   const tasks = buildTodayTasks(state);
   assert.equal(tasks.length, 4);
+  assert.equal(SYLLABUS_STAGES.length, 4);
+  assert.equal(SYLLABUS_MODULES.length, 12);
+  assert.equal(CERTIFICATION_TIERS.length, 3);
 });

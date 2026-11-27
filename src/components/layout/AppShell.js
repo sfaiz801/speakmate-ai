@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   LogOut,
+  Map,
 } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 import { useApp } from '@/context/AppContext';
@@ -27,6 +28,7 @@ const NAV_SECTIONS = [
     label: 'Learn',
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/syllabus', label: 'Syllabus & Certs', icon: Map },
       { href: '/tutor', label: 'AI Speaking Tutor', icon: Mic },
       { href: '/vocabulary', label: 'Daily Vocabulary', icon: BookOpen },
       { href: '/grammar', label: 'Grammar Lessons', icon: GraduationCap },
@@ -51,9 +53,9 @@ const NAV_SECTIONS = [
 
 const MOBILE_BOTTOM_ITEMS = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/syllabus', label: 'Syllabus', icon: Map },
   { href: '/tutor', label: 'AI Tutor', icon: Mic },
   { href: '/vocabulary', label: 'Vocab', icon: BookOpen },
-  { href: '/grammar', label: 'Grammar', icon: GraduationCap },
   { href: '/progress', label: 'Progress', icon: TrendingUp },
 ];
 

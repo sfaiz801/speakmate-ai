@@ -56,6 +56,10 @@ export function createDefaultAppState() {
       totalSpeakingMinutes: 102,
       totalSessions: 9,
       completedGrammarIds: ['sentence-structure'],
+      completedSyllabusIds: [],
+      writingSubmissions: {},
+      completedTaskIdsByDate: {},
+      earnedCertificates: [],
       quizScores: [
         {
           id: 'sample-quiz-1',

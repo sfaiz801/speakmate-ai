@@ -32,6 +32,16 @@ export default function TutorPage() {
   const activeModeObj = TUTOR_MODES.find((m) => m.id === selectedMode) || TUTOR_MODES[0];
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlMode = params.get('mode');
+      if (urlMode && TUTOR_MODES.some((m) => m.id === urlMode)) {
+        setSelectedMode(urlMode);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     fetch('/api/health')
       .then((r) => r.json())
       .then((data) => {

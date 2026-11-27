@@ -67,10 +67,16 @@ export default function DashboardPage() {
       title={`Namaste, ${profile.name}!`}
       subtitle={`Level: ${levelObj.name} • Daily Goal: ${goalMinutes} mins • Explanations in ${profile.explanationLanguage}`}
       actions={
-        <Link href="/tutor" className="btn sm-gradient-btn d-inline-flex align-items-center gap-2">
-          <Mic size={17} />
-          Talk to AI Tutor
-        </Link>
+        <div className="d-flex flex-wrap gap-2">
+          <Link href="/syllabus" className="btn btn-outline-primary d-inline-flex align-items-center gap-2 fw-semibold">
+            <BookOpen size={16} />
+            Full Syllabus &amp; Certs
+          </Link>
+          <Link href="/tutor" className="btn sm-gradient-btn d-inline-flex align-items-center gap-2">
+            <Mic size={17} />
+            Talk to AI Tutor
+          </Link>
+        </div>
       }
     >
       {/* Onboarding Nudge if not completed */}

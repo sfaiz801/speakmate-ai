@@ -316,6 +316,116 @@ export function AppProvider({ children }) {
     addToast({ title: 'Progress Reset', message: 'Local progress has been reset to defaults.', variant: 'info' });
   }, [addToast]);
 
+  const completeSyllabusModule = useCallback(
+    (moduleId, title) => {
+      const today = getTodayIsoDate();
+      persist((prev) => {
+        const set = new Set(prev.progress.completedSyllabusIds || []);
+        const alreadyDone = set.has(moduleId);
+        set.add(moduleId);
+        return {
+          ...prev,
+          progress: {
+            ...prev.progress,
+            streakDays: computeUpdatedStreak(
+              prev.progress.lastActiveDate,
+              prev.progress.streakDays,
+              today
+            ),
+            lastActiveDate: today,
+            completedSyllabusIds: Array.from(set),
+            dailyActivity: alreadyDone
+              ? prev.progress.dailyActivity
+              : upsertTodayActivity(prev.progress.dailyActivity, { minutes: 8, sessions: 1 }),
+            practiceHistory: alreadyDone
+              ? prev.progress.practiceHistory
+              : [
+                  {
+                    id: `syl-${Date.now()}`,
+                    type: 'syllabus',
+                    title: `Syllabus: ${title}`,
+                    durationMinutes: 8,
+                    summary: 'Completed speaking & writing module.',
+                    date: new Date().toISOString(),
+                  },
+                  ...(prev.progress.practiceHistory || []),
+                ].slice(0, 40),
+          },
+        };
+      });
+    },
+    [persist]
+  );
+
+  const saveWritingSubmission = useCallback(
+    (moduleId, text) => {
+      persist((prev) => ({
+        ...prev,
+        progress: {
+          ...prev.progress,
+          writingSubmissions: {
+            ...(prev.progress.writingSubmissions || {}),
+            [moduleId]: {
+              text,
+              updatedAt: new Date().toISOString(),
+            },
+          },
+        },
+      }));
+    },
+    [persist]
+  );
+
+  const toggleDailyTaskCheck = useCallback(
+    (taskId) => {
+      const today = getTodayIsoDate();
+      persist((prev) => {
+        const byDate = prev.progress.completedTaskIdsByDate || {};
+        const todayList = byDate[today] || [];
+        const exists = todayList.includes(taskId);
+        const nextToday = exists
+          ? todayList.filter((id) => id !== taskId)
+          : [...todayList, taskId];
+        return {
+          ...prev,
+          progress: {
+            ...prev.progress,
+            completedTaskIdsByDate: {
+              ...byDate,
+              [today]: nextToday,
+            },
+          },
+        };
+      });
+    },
+    [persist]
+  );
+
+  const earnCertificate = useCallback(
+    (certPayload) => {
+      persist((prev) => {
+        const existing = prev.progress.earnedCertificates || [];
+        if (existing.some((c) => c.id === certPayload.id)) {
+          return prev;
+        }
+        return {
+          ...prev,
+          progress: {
+            ...prev.progress,
+            earnedCertificates: [
+              ...existing,
+              {
+                ...certPayload,
+                issuedAt: new Date().toISOString().slice(0, 10),
+              },
+            ],
+          },
+        };
+      });
+    },
+    [persist]
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -336,6 +446,10 @@ export function AppProvider({ children }) {
         resetLocalPassword,
         logoutLocal,
         resetAllData,
+        completeSyllabusModule,
+        saveWritingSubmission,
+        toggleDailyTaskCheck,
+        earnCertificate,
       }}
     >
       {children}

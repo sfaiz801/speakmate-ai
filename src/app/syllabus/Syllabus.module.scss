@@ -1,0 +1,51 @@
+.tabBtn {
+  border-radius: 0.85rem;
+  font-weight: 700;
+  padding: 0.65rem 1.15rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.16s ease;
+
+  &:hover {
+    border-color: #c7d2fe;
+    color: #4f46e5;
+  }
+}
+
+.tabBtnActive {
+  background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.22);
+
+  &:hover {
+    color: #ffffff;
+  }
+}
+
+.certificateCard {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 60%, #eef2ff 100%);
+  border: 2px solid #4f46e5;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 14px 36px rgba(79, 70, 229, 0.12);
+}
+
+.certificateSeal {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+}
