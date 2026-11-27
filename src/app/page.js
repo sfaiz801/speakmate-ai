@@ -16,6 +16,7 @@ import {
   ChevronUp,
   ArrowRight,
   GraduationCap,
+  Award,
 } from 'lucide-react';
 import PublicNavbar from '@/components/layout/PublicNavbar';
 import BrandLogo from '@/components/layout/BrandLogo';
@@ -374,6 +375,67 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Certification Section */}
+      <section id="certification" className="py-5 bg-light border-top">
+        <div className="container py-3">
+          <div className="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4">
+            <div>
+              <span className="badge sm-badge-soft-primary rounded-pill px-3 py-2 mb-2 d-inline-flex align-items-center gap-1">
+                <Award size={14} />
+                SpeakMate AI Completion Certificates
+              </span>
+              <h2 className="h2 fw-bold text-dark mb-1">
+                Earn Milestone Certificates as You Learn
+              </h2>
+              <p className="text-muted mb-0">
+                Complete syllabus modules, speaking minutes, and short assessments to unlock
+                downloadable PNG &amp; printable PDF certificates.
+              </p>
+            </div>
+            <Link href="/certification" className="btn sm-gradient-btn fw-semibold flex-shrink-0">
+              View Certificates
+            </Link>
+          </div>
+
+          <div className="row g-4">
+            {[
+              {
+                level: 'A1–A2',
+                title: 'Foundation Certificate',
+                hindi: 'बुनियादी अंग्रेजी बोलचाल सर्टिफिकेट',
+                desc: 'Master greetings, daily routines, polite requests, and foundational grammar.',
+              },
+              {
+                level: 'B1',
+                title: 'Conversational Fluency Certificate',
+                hindi: 'दैनिक और ऑफिस बातचीत सर्टिफिकेट',
+                desc: 'Handle phone calls, workplace updates, and everyday situations naturally.',
+              },
+              {
+                level: 'B2–C1',
+                title: 'Career & Interview Mastery Certificate',
+                hindi: 'इंटरव्यू और प्रोफेशनल मास्टरी सर्टिफिकेट',
+                desc: 'Deliver structured STAR interview answers and lead fluent discussions.',
+              },
+            ].map((cert) => (
+              <div key={cert.title} className="col-12 col-md-4">
+                <div className="sm-card sm-card-interactive p-4 h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <span className="badge sm-badge-soft-blue rounded-pill">{cert.level}</span>
+                      <Award size={20} className="text-primary" />
+                    </div>
+                    <h3 className="h5 fw-bold mb-1">{cert.title}</h3>
+                    <div className="small text-primary fw-semibold mb-2">{cert.hindi}</div>
+                    <p className="small text-muted mb-0">{cert.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

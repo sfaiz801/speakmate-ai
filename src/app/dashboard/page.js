@@ -320,8 +320,8 @@ export default function DashboardPage() {
                     milestones.
                   </p>
                 </div>
-                <Link href="/syllabus?tab=certification" className="fw-semibold small text-primary d-inline-flex align-items-center gap-1">
-                  View Certification Tab <ArrowRight size={15} />
+                <Link href="/certification" className="fw-semibold small text-primary d-inline-flex align-items-center gap-1">
+                  Open Certification Section <ArrowRight size={15} />
                 </Link>
               </div>
             </div>

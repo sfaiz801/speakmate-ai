@@ -18,6 +18,7 @@ import {
   X,
   LogOut,
   Map,
+  Award,
 } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 import { useApp } from '@/context/AppContext';
@@ -40,6 +41,7 @@ const NAV_SECTIONS = [
       { href: '/conversation', label: 'Conversation Practice', icon: MessagesSquare },
       { href: '/interview', label: 'Interview Practice', icon: Briefcase },
       { href: '/progress', label: 'Progress Tracking', icon: TrendingUp },
+      { href: '/certification', label: 'Certification', icon: Award },
     ],
   },
   {

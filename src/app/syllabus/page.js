@@ -11,13 +11,11 @@ import {
   PenLine,
   CheckCircle2,
   Circle,
-  Lock,
   Sparkles,
-  Printer,
   ArrowRight,
-  HelpCircle,
 } from 'lucide-react';
 import AppShell from '@/components/layout/AppShell';
+import CertificationView from '@/components/certification/CertificationView';
 import { useApp } from '@/context/AppContext';
 import {
   SYLLABUS_STAGES,
@@ -34,7 +32,6 @@ export default function SyllabusPage() {
     completeSyllabusModule,
     saveWritingSubmission,
     toggleDailyTaskCheck,
-    earnCertificate,
     addToast,
   } = useApp();
 
@@ -45,10 +42,6 @@ export default function SyllabusPage() {
   const [showSampleWriting, setShowSampleWriting] = useState(false);
   const [aiWritingFeedback, setAiWritingFeedback] = useState(null);
   const [checkingWriting, setCheckingWriting] = useState(false);
-
-  // Certification assessment state
-  const [activeExamCertId, setActiveExamCertId] = useState(null);
-  const [examAnswers, setExamAnswers] = useState({});
 
   const moduleDetailRef = useRef(null);
 
@@ -179,51 +172,7 @@ export default function SyllabusPage() {
     },
   ];
 
-  // Certification metrics
-  const metrics = {
-    syllabusCount: completedSyllabusIds.length,
-    grammarCount: state?.progress?.completedGrammarIds?.length || 0,
-    wordsCount: state?.progress?.learnedWordIds?.length || 0,
-    speakingMinutes: state?.progress?.totalSpeakingMinutes || 0,
-  };
   const earnedCertificates = state?.progress?.earnedCertificates || [];
-
-  const handleSubmitCertExam = (tier) => {
-    const total = tier.assessment.length;
-    if (Object.keys(examAnswers).length < total) {
-      addToast({ title: 'Answer all questions', message: 'Please answer every assessment question.', variant: 'info' });
-      return;
-    }
-    let score = 0;
-    tier.assessment.forEach((q, idx) => {
-      if (examAnswers[idx] === q.correctIndex) score += 1;
-    });
-
-    const passScore = Math.ceil(total * 0.75);
-    if (score >= passScore) {
-      earnCertificate({
-        id: tier.id,
-        title: tier.title,
-        level: tier.level,
-        learnerName: state?.profile?.name || 'Learner',
-        score,
-        total,
-      });
-      setActiveExamCertId(null);
-      setExamAnswers({});
-      addToast({
-        title: 'Certificate Unlocked!',
-        message: `Congratulations! You passed (${score}/${total}) and earned ${tier.title}.`,
-        variant: 'success',
-      });
-    } else {
-      addToast({
-        title: `Score: ${score}/${total}`,
-        message: `You need at least ${passScore}/${total} to unlock this certificate. Review the lessons and try again!`,
-        variant: 'danger',
-      });
-    }
-  };
 
   return (
     <AppShell
@@ -677,191 +626,7 @@ export default function SyllabusPage() {
       )}
 
       {/* TAB 3: CERTIFICATION */}
-      {activeTab === 'certification' && (
-        <div className="d-flex flex-column gap-4">
-          <div className={`alert alert-info small mb-0 rounded-4 ${styles.noPrint}`}>
-            Complete the required syllabus modules, grammar lessons, vocabulary, and speaking minutes,
-            then pass the short 4-question assessment (75%+) to unlock your printable{' '}
-            <strong>SpeakMate AI Completion Certificate</strong>. (Note: These are SpeakMate AI
-            course completion certificates for personal learning &amp; portfolio tracking.)
-          </div>
-
-          {CERTIFICATION_TIERS.map((tier) => {
-            const req = tier.requirements;
-            const sylOk = metrics.syllabusCount >= req.minSyllabusModules;
-            const gramOk = metrics.grammarCount >= req.minGrammarLessons;
-            const wordOk = metrics.wordsCount >= req.minLearnedWords;
-            const minOk = metrics.speakingMinutes >= req.minSpeakingMinutes;
-            const eligible = sylOk && gramOk && wordOk && minOk;
-            const earned = earnedCertificates.find((c) => c.id === tier.id);
-            const examOpen = activeExamCertId === tier.id;
-
-            return (
-              <div key={tier.id} className="sm-card p-4">
-                <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
-                  <div>
-                    <span className="badge sm-badge-soft-primary rounded-pill mb-2">
-                      Level {tier.level}
-                    </span>
-                    <h2 className="h5 fw-bold mb-1">{tier.title}</h2>
-                    <div className="small text-primary fw-semibold mb-1">{tier.hindiTitle}</div>
-                    <p className="small text-muted mb-0">{tier.description}</p>
-                  </div>
-
-                  {earned ? (
-                    <span className="badge sm-badge-soft-success rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
-                      <CheckCircle2 size={15} /> Earned ({earned.issuedAt})
-                    </span>
-                  ) : eligible ? (
-                    <span className="badge sm-badge-soft-blue rounded-pill px-3 py-2">
-                      Ready for Assessment
-                    </span>
-                  ) : (
-                    <span className="badge sm-badge-soft-warning rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
-                      <Lock size={14} /> In Progress
-                    </span>
-                  )}
-                </div>
-
-                {/* Criteria checklist */}
-                <div className="row g-2 mb-3 small">
-                  <div className="col-6 col-md-3">
-                    <div className={`p-2 px-3 rounded-3 border ${sylOk ? 'border-success bg-success bg-opacity-10' : 'bg-light'}`}>
-                      <div className="fw-bold">Syllabus Modules</div>
-                      <div>{metrics.syllabusCount} / {req.minSyllabusModules}</div>
-                    </div>
-                  </div>
-                  <div className="col-6 col-md-3">
-                    <div className={`p-2 px-3 rounded-3 border ${gramOk ? 'border-success bg-success bg-opacity-10' : 'bg-light'}`}>
-                      <div className="fw-bold">Grammar Lessons</div>
-                      <div>{metrics.grammarCount} / {req.minGrammarLessons}</div>
-                    </div>
-                  </div>
-                  <div className="col-6 col-md-3">
-                    <div className={`p-2 px-3 rounded-3 border ${wordOk ? 'border-success bg-success bg-opacity-10' : 'bg-light'}`}>
-                      <div className="fw-bold">Words Learned</div>
-                      <div>{metrics.wordsCount} / {req.minLearnedWords}</div>
-                    </div>
-                  </div>
-                  <div className="col-6 col-md-3">
-                    <div className={`p-2 px-3 rounded-3 border ${minOk ? 'border-success bg-success bg-opacity-10' : 'bg-light'}`}>
-                      <div className="fw-bold">Speaking Minutes</div>
-                      <div>{metrics.speakingMinutes} / {req.minSpeakingMinutes}m</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Earned Printable Certificate */}
-                {earned && (
-                  <div className={`${styles.certificateCard} mt-3`}>
-                    <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                      <div>
-                        <div className="small text-uppercase fw-bold text-primary mb-1">
-                          SpeakMate AI • Certificate of Completion
-                        </div>
-                        <h3 className="h4 fw-bold text-dark mb-1">
-                          {earned.learnerName || state?.profile?.name || 'Learner'}
-                        </h3>
-                        <p className="small text-muted mb-2">
-                          has successfully completed the requirements and passed the assessment (
-                          {earned.score}/{earned.total}) for <strong>{tier.title}</strong> ({tier.level}).
-                        </p>
-                        <div className="small fw-semibold text-dark">
-                          Issued on: {earned.issuedAt}
-                        </div>
-                      </div>
-                      <div className="d-flex flex-column align-items-md-end gap-2">
-                        <div className={styles.certificateSeal} aria-hidden="true">
-                          <Award size={28} />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => window.print()}
-                          className={`btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 ${styles.noPrint}`}
-                        >
-                          <Printer size={15} />
-                          Print / Save PDF
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Exam Button / Quiz */}
-                {!earned && (
-                  <div className={styles.noPrint}>
-                    {!examOpen ? (
-                      <button
-                        type="button"
-                        disabled={!eligible}
-                        onClick={() => {
-                          setActiveExamCertId(tier.id);
-                          setExamAnswers({});
-                        }}
-                        className={`btn btn-sm ${eligible ? 'sm-gradient-btn' : 'btn-outline-secondary'}`}
-                      >
-                        <HelpCircle size={15} className="me-1" />
-                        {eligible
-                          ? 'Take Certification Assessment'
-                          : 'Complete All 4 Criteria Above to Unlock Exam'}
-                      </button>
-                    ) : (
-                      <div className="p-3 p-md-4 rounded-4 border bg-light mt-2">
-                        <h3 className="h6 fw-bold mb-3">
-                          {tier.title} — Assessment (Need 3/4 to Pass)
-                        </h3>
-                        <div className="d-flex flex-column gap-3 mb-3">
-                          {tier.assessment.map((q, qIdx) => (
-                            <div key={qIdx} className="p-3 rounded-3 bg-white border">
-                              <div className="fw-semibold small mb-2">
-                                {qIdx + 1}. {q.question}
-                              </div>
-                              <div className="d-flex flex-column gap-2">
-                                {q.options.map((opt, optIdx) => (
-                                  <button
-                                    key={opt}
-                                    type="button"
-                                    onClick={() =>
-                                      setExamAnswers((prev) => ({ ...prev, [qIdx]: optIdx }))
-                                    }
-                                    className={`btn btn-sm text-start border ${
-                                      examAnswers[qIdx] === optIdx
-                                        ? 'btn-primary text-white'
-                                        : 'btn-light text-dark'
-                                    }`}
-                                  >
-                                    {opt}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="d-flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleSubmitCertExam(tier)}
-                            className="btn btn-sm sm-gradient-btn px-4"
-                          >
-                            Submit Assessment
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setActiveExamCertId(null)}
-                            className="btn btn-sm btn-outline-secondary"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {activeTab === 'certification' && <CertificationView />}
     </AppShell>
   );
 }
