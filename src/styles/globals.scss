@@ -18,7 +18,7 @@
 html,
 body {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   background-color: var(--sm-bg);
   color: var(--sm-text);
   font-family: $font-family-sans-serif;
