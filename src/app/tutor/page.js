@@ -234,6 +234,9 @@ export default function TutorPage() {
         <div className="small text-muted mt-2">
           <strong className="text-dark">{activeModeObj.title}:</strong> {activeModeObj.subtitle} •{' '}
           <span className="text-primary">{activeModeObj.hindiHint}</span>
+          <span className="d-block d-md-inline ms-md-2 text-success fw-medium">
+            • Speak in English, broken English, or Hinglish—your coach helps you naturally.
+          </span>
         </div>
       </div>
 

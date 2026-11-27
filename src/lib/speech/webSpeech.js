@@ -43,14 +43,34 @@ export function mapSpeechRecognitionError(errorCode) {
 
 export function pickPreferredEnglishVoice(voices = [], preferredLang = 'en-IN') {
   if (!voices.length) return null;
-  return (
-    voices.find((v) => v.lang === preferredLang) ||
-    voices.find((v) => v.lang?.startsWith('en-IN')) ||
-    voices.find((v) => v.lang?.startsWith('en-GB')) ||
-    voices.find((v) => v.lang?.startsWith('en-US')) ||
-    voices.find((v) => v.lang?.startsWith('en')) ||
-    voices[0]
-  );
+  const scoreVoice = (v) => {
+    let score = 0;
+    const name = (v.name || '').toLowerCase();
+    const lang = v.lang || '';
+    if (lang === preferredLang) score += 50;
+    else if (lang.startsWith('en-IN')) score += 40;
+    else if (lang.startsWith('en-GB')) score += 30;
+    else if (lang.startsWith('en-US')) score += 25;
+    else if (lang.startsWith('en')) score += 15;
+    else return -1;
+
+    if (name.includes('natural')) score += 30;
+    if (name.includes('google')) score += 25;
+    if (name.includes('online')) score += 20;
+    if (name.includes('microsoft')) score += 10;
+    return score;
+  };
+
+  let best = null;
+  let bestScore = -1;
+  for (const v of voices) {
+    const s = scoreVoice(v);
+    if (s > bestScore) {
+      bestScore = s;
+      best = v;
+    }
+  }
+  return best || voices[0];
 }
 
 let activeSpeechToken = 0;
