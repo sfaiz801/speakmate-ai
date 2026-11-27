@@ -53,6 +53,31 @@ export function getTodayMinutes(dailyActivity = []) {
   return entry ? entry.minutes || 0 : 0;
 }
 
+/**
+ * Aligns weekly chart data to the exact last 7 real calendar days.
+ */
+export function getLastSevenDaysSeries(dailyActivity = []) {
+  const byDate = new Map((dailyActivity || []).map((d) => [d.date, d]));
+  const result = [];
+  const today = new Date();
+
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const iso = d.toISOString().slice(0, 10);
+    const label = d.toLocaleDateString('en-IN', { weekday: 'short' });
+    const found = byDate.get(iso);
+    result.push({
+      date: iso,
+      label,
+      minutes: found?.minutes || 0,
+      sessions: found?.sessions || 0,
+      wordsLearned: found?.wordsLearned || 0,
+    });
+  }
+  return result;
+}
+
 export function buildTodayTasks(state) {
   const todayMinutes = getTodayMinutes(state?.progress?.dailyActivity);
   const goal = state?.profile?.dailyGoalMinutes || 15;

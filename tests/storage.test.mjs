@@ -4,6 +4,7 @@ import {
   computeUpdatedStreak,
   upsertTodayActivity,
   buildTodayTasks,
+  getLastSevenDaysSeries,
 } from '../src/lib/storage/progressHelpers.js';
 import { createDefaultAppState } from '../src/lib/storage/defaultState.js';
 import { GRAMMAR_LESSONS } from '../src/data/grammarLessons.js';
@@ -34,9 +35,15 @@ test('upsertTodayActivity aggregates minutes and sessions for today', () => {
   assert.equal(afterSecond[0].wordsLearned, 5);
 });
 
-test('createDefaultAppState and curriculum datasets satisfy required counts', () => {
+test('createDefaultAppState starts with zeroed real-time tracking and curriculum satisfies counts', () => {
   const state = createDefaultAppState();
   assert.equal(state.auth.mode, 'local');
+  assert.equal(state.version, 2);
+  assert.equal(state.progress.streakDays, 0);
+  assert.equal(state.progress.totalSpeakingMinutes, 0);
+  assert.equal(state.progress.totalSessions, 0);
+  assert.equal(state.progress.practiceHistory.length, 0);
+  assert.equal(getLastSevenDaysSeries(state.progress.dailyActivity).length, 7);
   assert.equal(GRAMMAR_LESSONS.length, 11);
   assert.equal(CONVERSATION_SCENARIOS.length, 9);
   for (const set of VOCABULARY_SETS) {

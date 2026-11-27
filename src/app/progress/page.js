@@ -17,12 +17,13 @@ import { DashboardSkeleton } from '@/components/common/LoadingSkeleton';
 import { useApp } from '@/context/AppContext';
 import { GRAMMAR_LESSONS } from '@/data/grammarLessons';
 import { ALL_VOCABULARY_WORDS } from '@/data/vocabularyData';
+import { getLastSevenDaysSeries } from '@/lib/storage/progressHelpers';
 
 export default function ProgressPage() {
   const { state, isHydrated } = useApp();
 
   const activityLineData = useMemo(() => {
-    const days = (state?.progress?.dailyActivity || []).slice(-7);
+    const days = getLastSevenDaysSeries(state?.progress?.dailyActivity);
     return {
       labels: days.map((d) => d.label || d.date?.slice(5)),
       datasets: [

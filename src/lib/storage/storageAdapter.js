@@ -1,6 +1,6 @@
 import { createDefaultAppState } from './defaultState';
 
-const STORAGE_KEY = 'speakmate_ai_state_v1';
+export const STORAGE_KEY = 'speakmate_ai_state_v1';
 const ACCOUNTS_KEY = 'speakmate_ai_local_accounts_v1';
 
 /**
@@ -32,6 +32,27 @@ export const storageAdapter = {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return fallback;
       const parsed = JSON.parse(raw);
+
+      // Migrate legacy v1 sample-seeded state to real-time v2 state
+      if (!parsed.version || parsed.version < 2) {
+        const migrated = {
+          ...fallback,
+          version: 2,
+          auth: { ...fallback.auth, ...(parsed.auth || {}) },
+          profile: { ...fallback.profile, ...(parsed.profile || {}) },
+          settings: { ...fallback.settings, ...(parsed.settings || {}) },
+          progress: {
+            ...fallback.progress,
+            completedSyllabusIds: parsed.progress?.completedSyllabusIds || [],
+            writingSubmissions: parsed.progress?.writingSubmissions || {},
+            completedTaskIdsByDate: parsed.progress?.completedTaskIdsByDate || {},
+            earnedCertificates: parsed.progress?.earnedCertificates || [],
+          },
+        };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+
       return {
         ...fallback,
         ...parsed,

@@ -17,7 +17,7 @@ import { TUTOR_MODES } from '@/data/levels';
 import { speakText, stopSpeaking } from '@/lib/speech/webSpeech';
 
 export default function TutorPage() {
-  const { state, isHydrated, logPracticeSession, addToast } = useApp();
+  const { state, isHydrated, recordSpeakingTurn } = useApp();
 
   const [selectedMode, setSelectedMode] = useState(TUTOR_MODES[0].id);
   const [messages, setMessages] = useState([]);
@@ -136,7 +136,15 @@ export default function TutorPage() {
       };
 
       setMessages((prev) => [...prev, aiMsg]);
+      const isFirstTurn = turnCount === 0;
       setTurnCount((prev) => prev + 1);
+      recordSpeakingTurn({
+        type: 'tutor',
+        title: `AI Tutor: ${activeModeObj.title}`,
+        minutesDelta: 2,
+        isNewSession: isFirstTurn,
+        summary: `Practiced ${activeModeObj.title} with live coaching.`,
+      });
 
       if (state?.settings?.autoSpeakResponses !== false) {
         handlePlayAudio(replyText);
@@ -147,22 +155,6 @@ export default function TutorPage() {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const handleSaveSession = () => {
-    const mins = Math.max(2, turnCount * 2);
-    logPracticeSession({
-      type: 'tutor',
-      title: `AI Tutor: ${activeModeObj.title}`,
-      durationMinutes: mins,
-      summary: `Completed ${turnCount} speaking turns in ${activeModeObj.title}.`,
-    });
-    addToast({
-      title: 'Session Saved!',
-      message: `Added ${mins} practice minutes to your streak & progress.`,
-      variant: 'success',
-    });
-    setTurnCount(0);
   };
 
   const handleResetChat = () => {
@@ -188,16 +180,12 @@ export default function TutorPage() {
           : 'Loading your personal tutor...'
       }
       actions={
-        <div className="d-flex flex-wrap gap-2">
+        <div className="d-flex flex-wrap align-items-center gap-2">
           {turnCount > 0 && (
-            <button
-              type="button"
-              onClick={handleSaveSession}
-              className="btn btn-success d-inline-flex align-items-center gap-1"
-            >
-              <BookmarkCheck size={16} />
-              Save Practice ({turnCount} turns)
-            </button>
+            <span className="badge sm-badge-soft-success rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+              <BookmarkCheck size={15} />
+              Live Synced ({turnCount} {turnCount === 1 ? 'turn' : 'turns'})
+            </span>
           )}
           <button
             type="button"

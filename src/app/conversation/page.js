@@ -16,7 +16,7 @@ import { CONVERSATION_SCENARIOS } from '@/data/conversationScenarios';
 import { speakText, stopSpeaking } from '@/lib/speech/webSpeech';
 
 export default function ConversationPracticePage() {
-  const { state, logPracticeSession, addToast } = useApp();
+  const { state, recordSpeakingTurn, addToast } = useApp();
 
   const [scenarioId, setScenarioId] = useState(CONVERSATION_SCENARIOS[0].id);
   const [messages, setMessages] = useState([]);
@@ -84,10 +84,19 @@ export default function ConversationPracticePage() {
       const replyText = json.data?.reply || 'That sounds great! What else would you like to say?';
       const tip = json.data?.quickCoachTip || '';
 
+      const isFirstUserTurn = messages.filter((m) => m.role === 'user').length === 1;
       setMessages((prev) => [
         ...prev,
         { id: `a-${Date.now()}`, role: 'assistant', text: replyText, tip },
       ]);
+
+      recordSpeakingTurn({
+        type: 'conversation',
+        title: `Roleplay: ${scenario.title}`,
+        minutesDelta: 2,
+        isNewSession: isFirstUserTurn,
+        summary: `Practiced real-life roleplay: ${scenario.title}.`,
+      });
 
       if (state?.settings?.autoSpeakResponses !== false) {
         playReply(replyText);
@@ -132,12 +141,6 @@ export default function ConversationPracticePage() {
       }
 
       setReport(json.data);
-      logPracticeSession({
-        type: 'conversation',
-        title: `Roleplay: ${scenario.title}`,
-        durationMinutes: Math.max(3, userTurns.length * 2),
-        summary: json.data?.overallSummary || `Completed ${scenario.title} roleplay.`,
-      });
       addToast({
         title: 'Performance Report Ready!',
         message: 'Roleplay session saved to your progress.',

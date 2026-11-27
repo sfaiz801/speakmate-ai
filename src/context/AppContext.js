@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { createDefaultAppState } from '@/lib/storage/defaultState';
-import { storageAdapter, simpleLocalHash } from '@/lib/storage/storageAdapter';
+import { STORAGE_KEY, storageAdapter, simpleLocalHash } from '@/lib/storage/storageAdapter';
 import {
   computeUpdatedStreak,
   getTodayIsoDate,
@@ -20,6 +20,23 @@ export function AppProvider({ children }) {
     const loaded = storageAdapter.loadState();
     setState(loaded);
     setIsHydrated(true);
+
+    const handleSync = (event) => {
+      if (!event || event.key === STORAGE_KEY) {
+        setState(storageAdapter.loadState());
+      }
+    };
+
+    const handleFocus = () => {
+      setState(storageAdapter.loadState());
+    };
+
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const persist = useCallback((updater) => {
@@ -67,6 +84,60 @@ export function AppProvider({ children }) {
           ...updates,
         },
       }));
+    },
+    [persist]
+  );
+
+  const recordSpeakingTurn = useCallback(
+    ({ type = 'tutor', title, minutesDelta = 1, isNewSession = false, summary = '' }) => {
+      const today = getTodayIsoDate();
+      persist((prev) => {
+        const nextStreak = computeUpdatedStreak(
+          prev.progress.lastActiveDate,
+          prev.progress.streakDays,
+          today
+        );
+        const mins = Math.max(1, Math.round(minutesDelta));
+        const existingHistory = prev.progress.practiceHistory || [];
+        let nextHistory = existingHistory;
+
+        if (isNewSession) {
+          nextHistory = [
+            {
+              id: `live-${Date.now()}`,
+              type,
+              title: title || 'AI Speaking Session',
+              durationMinutes: mins,
+              summary: summary || 'Live AI speaking practice',
+              date: new Date().toISOString(),
+            },
+            ...existingHistory,
+          ].slice(0, 40);
+        } else if (existingHistory.length > 0 && existingHistory[0].type === type && existingHistory[0].title === title) {
+          const updatedTop = {
+            ...existingHistory[0],
+            durationMinutes: (existingHistory[0].durationMinutes || 0) + mins,
+            date: new Date().toISOString(),
+          };
+          nextHistory = [updatedTop, ...existingHistory.slice(1)];
+        }
+
+        return {
+          ...prev,
+          progress: {
+            ...prev.progress,
+            streakDays: nextStreak,
+            lastActiveDate: today,
+            totalSpeakingMinutes: (prev.progress.totalSpeakingMinutes || 0) + mins,
+            totalSessions: (prev.progress.totalSessions || 0) + (isNewSession ? 1 : 0),
+            dailyActivity: upsertTodayActivity(prev.progress.dailyActivity, {
+              minutes: mins,
+              sessions: isNewSession ? 1 : 0,
+            }),
+            practiceHistory: nextHistory,
+          },
+        };
+      });
     },
     [persist]
   );
@@ -436,6 +507,7 @@ export function AppProvider({ children }) {
         dismissToast,
         updateProfile,
         updateSettings,
+        recordSpeakingTurn,
         logPracticeSession,
         completeGrammarLesson,
         toggleSaveWord,
